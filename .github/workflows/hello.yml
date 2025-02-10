@@ -1,10 +1,8 @@
-name: Secrets
+name: Conditions
 on: push
 jobs:
-  print:
+  skip-or-run:
     runs-on: ubuntu-latest
-    env:
-      PASSWORD: ${{ secrets.PASSWORD }}           # Secretsの参照
     steps:
-      - run: echo "${PASSWORD}"                   # ログ出力はマスクされる
-      - run: echo "${PASSWORD:0:1} ${PASSWORD#?}" # ログ出力はマスクされない
+      - run: echo "Hello"
+        if: ${{ contains(github.run_id, '1') }} # ワークフロー実行IDで分岐
