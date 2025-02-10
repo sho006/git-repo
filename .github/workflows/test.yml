@@ -1,13 +1,18 @@
-name: Test
+name: Static analysis
 on:
-  pull_request:                        # プルリクエストが作成されたら起動
-    paths: ['go/**/*.go']              # ただしGoのファイル変更時のみ
+  pull_request:
+    paths: ['.github/workflows/*.yml', '.github/workflows/*.yaml']
+defaults:                                         # デフォルトシェル
+  run:
+    shell: bash
+concurrency:                                      # 自動キャンセル
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
+    timeout-minutes: 5                            # タイムアウト
     steps:
-      - uses: actions/checkout@v4      # ステップ1: チェックアウト
-      - uses: actions/setup-go@v5      # ステップ2: 言語セットアップ
-        with:
-          go-version: '1.22'
-      - run: go test go/excellent/*.go # ステップ3: テストの実行。
+      - uses: actions/checkout@v4
+      - run: |                                    # 静的解析の実行
+          docker run --rm -v "$(pwd):$(pwd)" -w "$(pwd)" rhysd/actionlint:latest
