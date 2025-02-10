@@ -1,19 +1,21 @@
-name: Environments
-on:
-  workflow_dispatch:
-    inputs:
-      environment-name:
-        type: environment             # 入力パラメータでEnvironmentsを切り替え
-        default: test
-        required: false
-        description: Environment name
+name: Artifacts
+on: push
 jobs:
-  print:
+  upload:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment-name }} # 利用するEnvironmentsを指定
-    env:
-      USERNAME: ${{ vars.USERNAME }}            # Environment variablesの参照
-      PASSWORD: ${{ secrets.PASSWORD }}         # Environment secretsの参照
     steps:
-      - run: echo "${USERNAME}"
-      - run: echo "${PASSWORD:0:1} ${PASSWORD#?}"
+      - run: date > date.txt               # アーティファクトの生成
+      - uses: actions/upload-artifact@v4   # アーティファクトのアップロード
+        with:
+          name: uploaded                   # アーティファクト名
+          path: date.txt                   # アップロード対象のパス
+          retention-days: 7                # アーティファクトの保存期間
+  download:
+    runs-on: ubuntu-latest
+    needs: [upload]                        # uploadジョブの実行を待つ
+    steps:
+      - uses: actions/download-artifact@v4 # アーティファクトのダウンロード
+        with:
+          name: uploaded                   # アーティファクト名
+          path: downloaded                 # ダウンロード先のパス
+      - run: cat downloaded/date.txt       # アーティファクトを標準出力
