@@ -1,8 +1,13 @@
-name: Conditions
-on: push
+name: Test
+on:
+  pull_request:                        # プルリクエストが作成されたら起動
+    paths: ['go/**/*.go']              # ただしGoのファイル変更時のみ
 jobs:
-  skip-or-run:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Hello02"
-        if: ${{ contains(github.run_id, '1') }} # ワークフロー実行IDで分岐
+      - uses: actions/checkout@v4      # ステップ1: チェックアウト
+      - uses: actions/setup-go@v5      # ステップ2: 言語セットアップ
+        with:
+          go-version: '1.22'
+      - run: go test go/excellent/*.go # ステップ3: テストの実行
