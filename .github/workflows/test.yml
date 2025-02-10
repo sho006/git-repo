@@ -1,12 +1,15 @@
-name: Change shell
+name: Parallel jobs
 on: push
-jobs:
-  print:
+jobs: # jobsキーへ複数のジョブを定義すれば、並列に実行される
+  first:
     runs-on: ubuntu-latest
     steps:
-      - shell: bash          # シェルにBashを指定
-        run: echo "${SHELL}"
-      - shell: python        # シェルにPythonを指定
-        run: |
-          import os
-          print(os.environ['PATH'])
+      - run: sleep 10 && echo "First job"
+  second:
+    runs-on: ubuntu-latest
+    steps:
+      - run: sleep 10 && echo "Second job"
+  third:
+     runs-on: ubuntu-latest
+     steps:
+      - run: sleep 10 && echo "Third job"
